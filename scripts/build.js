@@ -111,7 +111,7 @@ try {
     fs.rmdirSync(releasePath, { recursive: true });
     console.log("deleted \"" + releasePath + "\"");
 
-    fs.mkdirSync(releasePath);
+    fs.mkdirSync(releasePath, { recursive: true });
     let tPath_www = path.join(releasePath, "www");
     fs.mkdirSync(tPath_www);
     let tPath_src = path.join(releasePath, "src");

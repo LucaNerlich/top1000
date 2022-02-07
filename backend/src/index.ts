@@ -49,7 +49,7 @@ db.connect().then(() => {
     server.on('error', err => {
         console.error(err);
     });
-    server.listen(8000, () => {
+    server.listen(8001, () => {
         const address = server.address();
         if(typeof address === "object" && address !== null) {
             console.log("server started. listening at port " + address.port);    
