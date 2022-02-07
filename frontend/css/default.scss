@@ -70,12 +70,14 @@ h1 {
 
         >div:nth-of-type(2) {
             order: 2;
-            flex-grow: 1;
+            flex-grow: 5;
+            flex-shrink: 5;
 
             select {
-                width: 100%;
+                width: 100% !important;
                 border-right: 0 !important;
             }
+
         }
 
         >div:last-of-type {
