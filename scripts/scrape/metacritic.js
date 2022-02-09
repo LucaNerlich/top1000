@@ -26,7 +26,7 @@ async function start(filename) {
     const outfile = path.join(outpath, filename);
 
     const games = new Map();
-    for(let i = 0; i < 100; i++) {
+    for(let i = 0; i <= 191; i++) {
         if(i > 0 && i % 5 === 0) {
             console.log( i + " pages parsed...");
         }
@@ -38,22 +38,25 @@ async function start(filename) {
 
         const el_rows = $("#main_content div.content_after_header").find("tr");
 
-        let el_columns, el_details, score, link, nr, name, platform, date, game;
+        let el_columns, el_details, score, link, nr, name, platform, date, year, game;
         for(let i = 0; i < el_rows.length; i++) {
             el_columns = el_rows.eq(i).children("td");
             el_details = el_columns.eq(1);
 
             score = parseInt(el_columns.eq(0).find("div").first().text());
-            link = "https://www.metacritic.com" + el_details.find("a.title").first().attr("href").trim().replace(/","/g, "\\\"");
+            link = el_details.find("a.title").first().attr("href").trim().replace(/","/g, "\\\"");
             nr = parseInt(el_details.find("span.title").first().text());
             name = el_details.find("h3").first().text().trim().replace(/","/g, "\\\"");
             platform = el_details.find("div.platform span.data").first().text().trim().replace(/","/g, "\\\"");
             date = el_details.find(">span").first().text().trim().replace(/","/g, "\\\"");
+            year = parseInt(date.match(/[0-9]{4}/)[0]);
 
             game = games.get(name);
             if(game === undefined) {
                 game = {
-                    "platforms": new Map()
+                    "platforms": new Map(),
+                    "year": year,
+                    "link": link
                 };
             }
             game.platforms.set(platform, {
@@ -62,6 +65,10 @@ async function start(filename) {
                 "date": date,
                 "score": score
             });
+            if(year < game.year) {
+                game.year = year;
+                game.link = link;
+            }
             games.set(name, game);
         }
     }
@@ -75,7 +82,7 @@ async function start(filename) {
 
     let count = 0;
     for(const [name, game] of games.entries()) {
-        f.write("\"" + escapeString(name) + "\",");
+        f.write("\"" + escapeString(name) + "\"," + game.year + ",https://www.metacritic.com" + game.link + ",");
         let overall_sum = 0;
         let overall_count = 0;
         for(const [platform, data] of game.platforms.entries()) {
@@ -96,5 +103,5 @@ async function start(filename) {
 start("metacritic.csv").then(() => {
     console.log("done");
 }).catch(exc => {
-    console.error(exc);
+    console.error(exc); 
 })

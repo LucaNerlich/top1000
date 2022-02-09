@@ -24,7 +24,7 @@
             "name": "debugscript",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",            
-            "program": "${workspaceFolder}/scripts/scrape/kultboy.js",
+            "program": "${workspaceFolder}/scripts/scrape/metacritic.js",
             "request": "launch",
             "restart": true,
             "runtimeExecutable": "node",
