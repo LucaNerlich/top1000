@@ -26,6 +26,7 @@
     "cheerio": "^1.0.0-rc.10",
     "chokidar": "^3.5.3",
     "eslint": "^8.4.1",
+    "html-entities": "^2.3.2",
     "nodemon": "^2.0.15",
     "rollup": "^2.67.1",
     "rollup-plugin-terser": "^7.0.2",
