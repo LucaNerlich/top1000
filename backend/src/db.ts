@@ -1,6 +1,29 @@
 import MongoStore from "connect-mongo";
 import { Store as SessionStore } from "express-session";
-import { MongoClient, ReadPreference, Collection, MongoClientOptions } from "mongodb";
+import { MongoClient, ReadPreference, Collection, MongoClientOptions, ObjectId } from "mongodb";
+import { InputError } from "./exceptions";
+
+export type PollOption = {
+	name: string,
+	votes: number
+};
+
+export type PollData = {
+	_id: ObjectId,
+	staffel: number,
+	thema: string,
+	stage: string,
+	created_at: Date,
+	last_posted_at: Date,
+	posts_count: number,
+	views: number,
+	participant_count: number,
+	like_count: number,
+	word_count: number,
+	voters: number,
+	options: PollOption[],
+    winner?: number | null
+};
 
 const regex_escape = /[.*+?^${}()|[\]\\]/g;
 
@@ -8,6 +31,7 @@ export class MongoDB
 {
     private client: MongoClient | undefined;
     private games: Collection | undefined;
+    private polls: Collection | undefined;
 
     public async connect(): Promise<void> {
         const url = process.env.MDB_TOP1000;
@@ -24,6 +48,7 @@ export class MongoDB
             const db = this.client.db("top1000");
             await db.command({ ping: 1 });
             this.games = db.collection("games");
+            this.polls = db.collection("polls");
             console.log("Connected to mongodb server");
         } catch(err) {
             await this.close();
@@ -50,6 +75,80 @@ export class MongoDB
                 }
             });
         }
+    }
+
+    public async getPollData(id: string): Promise<PollData> {
+        if(this.polls === undefined) {
+            throw new Error("No database connection");
+        }
+        if(id.length !== 24) {
+            throw new InputError("Invalid id");
+        }
+        const data = await this.polls.findOne({
+            "_id": ObjectId.createFromHexString(id)
+        });
+        if(data === null) {
+            throw new InputError("Not found");
+        }
+        return data as PollData;
+    }
+
+    public async getLGSActivity(): Promise<PollData[]> {
+        if(this.polls === undefined) {
+            throw new Error("No database connection");
+        }
+        return await this.polls.find({ "$or": [ { "stage": "Viertelfinale" } , { "stage": "Halbfinale"}, { "stage": "Finale"}, {"stage": "Achtelfinale"}]}, {"sort": { "created_at": 1}}).toArray() as PollData[];
+    }
+
+    public async getStaffelData(id: number): Promise<PollData[]> {
+        if(this.polls === undefined) {
+            throw new Error("No database connection");
+        }
+        const data = await this.polls.find({"staffel": id, "$or": [ { "stage": "Viertelfinale" } , { "stage": "Halbfinale"}, { "stage": "Finale"}, {"stage": "Achtelfinale"}]}, {"sort": { "created_at": 1}}).toArray();
+        if(data.length === 0) {
+            throw new InputError("Season not found");
+        }
+        return data as PollData[];
+    }
+
+    public async getPollList(id: string): Promise<PollData[]> {
+        if(this.polls === undefined) {
+            throw new Error("No database connection");
+        }
+        let thema;
+        switch(id) {
+            case "bonus": {
+                thema = "Bonusfolgen";
+                break;
+            }
+            case "belt": {
+                thema = "Wer hat den Gürtel";
+                break;
+            }
+            case "top5": {
+                thema = "Superleague/Top5";
+                break;
+            }
+            default: {
+                throw new InputError("Invalid id");
+            }
+        }
+        const data = await this.polls.find({
+            "thema": thema
+        }, {
+            "sort": {
+                "created_at": 1
+            },
+            "projection": {
+                "_id": 0,
+                "id": "$_id",
+                "title": "$stage"
+            }
+        }).toArray();
+        if(data.length === 0) {
+            throw new InputError("Nothing found.");
+        }
+        return data as PollData[];
     }
 
     public async search(input: string, page?: number) {

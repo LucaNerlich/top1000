@@ -4,18 +4,22 @@ import create_express from "express";
 import create_session from "express-session";
 import { join as joinPath } from "path";
 import { MongoDB } from "./db";
-
-const path_www = joinPath(__dirname, "../www");
+import { StatsPage } from "./stats";
+import { InputError } from "./exceptions";
 
 const app = create_express();
-app.use(express.static(path_www));
+app.use(express.static(joinPath(__dirname, "../www")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 const db = new MongoDB();
+const stats = new StatsPage(db);
+const html_path = joinPath(__dirname, "../html/index.html");
+
+app.use("/stats", stats.getRouter());
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    res.type("html").sendFile(joinPath(__dirname, "../html/index.html"));
+    res.type("html").sendFile(html_path);
 });
 
 app.get("/search", async(req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -35,7 +39,12 @@ app.use((err: unknown, req: express.Request, res: express.Response, next: expres
     if(res.headersSent) {
         return next(err);
     }
-    res.status(500).send("internal error");
+    if(err instanceof InputError) {
+        res.status(400).send(err.message);
+    } else {
+        console.error(err);
+        res.status(500).send("internal error");
+    }
 });
 
 db.connect().then(() => {

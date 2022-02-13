@@ -5,6 +5,7 @@ const rollup = require("rollup");
 const terser = require("rollup-plugin-terser");
 const typescript = require("@rollup/plugin-typescript");
 const sass = require("sass");
+const { nodeResolve } = require("@rollup/plugin-node-resolve");
 
 const rootPath = path.join(__dirname, "..");
 const releasePath = path.join(rootPath, "built");
@@ -13,7 +14,7 @@ const backendPath = path.join(rootPath, "backend");
 
 function processCSS(outpath) {
     const srcPath_css = path.join(frontendPath, "css");
-    const srcFilenames_css = fs.readdirSync(srcPath_css, { withFileTypes: true });
+    let srcFilenames_css = fs.readdirSync(srcPath_css, { withFileTypes: true });
     for(let i = 0; i < srcFilenames_css.length; i++) {
         if(srcFilenames_css[i].isFile()) {
             const extension = path.extname(srcFilenames_css[i].name);
@@ -34,6 +35,17 @@ function processCSS(outpath) {
             console.log("created \"" + tFile.toString() + "\"");
         }
     }
+
+    const srcPath_lib = path.join(srcPath_css, "lib");
+    const outPath_lib = path.join(outpath, "lib");
+    fs.mkdirSync(outPath_lib);
+    srcFilenames_css = fs.readdirSync(srcPath_lib, { withFileTypes: true });
+    for(let i = 0; i < srcFilenames_css.length; i++) {
+        if(srcFilenames_css[i].isFile()) {
+            fs.copyFileSync(path.join(srcPath_lib, srcFilenames_css[i].name), path.join(outPath_lib, srcFilenames_css[i].name));
+        }
+    }
+    console.log("created \"" + outPath_lib + "\"");
 }
 
 function processHTML(outpath) {
@@ -42,7 +54,7 @@ function processHTML(outpath) {
     let temp = fs.readdirSync(src_dir, { "withFileTypes": true });
     for(let i = 0; i < temp.length; i++) {
         if(temp[i].isFile()) {
-            fs.copyFileSync(path.join(src_dir, temp[i].name), path.join(outpath, temp[i].name))
+            fs.copyFileSync(path.join(src_dir, temp[i].name), path.join(outpath, temp[i].name));
         }
     }
     console.log("created \"" + outpath + "\"");
@@ -54,20 +66,54 @@ function processIcons(outpath) {
     let temp = fs.readdirSync(src_dir, { "withFileTypes": true });
     for(let i = 0; i < temp.length; i++) {
         if(temp[i].isFile()) {
-            fs.copyFileSync(path.join(src_dir, temp[i].name), path.join(outpath, temp[i].name))
+            fs.copyFileSync(path.join(src_dir, temp[i].name), path.join(outpath, temp[i].name));
+        }
+    }
+    console.log("created \"" + outpath + "\"");
+}
+
+function processJSLibs(outpath) {
+    let src_dir = path.join(frontendPath, "src/lib");
+
+    let temp = fs.readdirSync(src_dir, { "withFileTypes": true });
+    for(let i = 0; i < temp.length; i++) {
+        if(temp[i].isFile()) {
+            fs.copyFileSync(path.join(src_dir, temp[i].name), path.join(outpath, temp[i].name));
         }
     }
     console.log("created \"" + outpath + "\"");
 }
 
 async function processFrontendJS(outpath) {
-    const tFile = path.join(outpath, "index.js");
+    let tFile = path.join(outpath, "index.js");
     let bundle = await rollup.rollup({
         "input": path.join(frontendPath, "src/index.ts"),
         "plugins": [typescript({
             "tsconfig": path.join(frontendPath, "tsconfig.json"),
             "sourceMap": false,
             "mapRoot": undefined
+        })]
+    });
+    await bundle.write({
+        "file": tFile,
+        "format": "iife",
+        "plugins": [terser.terser({
+            "format": {
+                "comments": false
+            }
+        })],
+        "sourcemap": false
+    });
+    console.log("created \"" + tFile + "\"");
+    tFile = path.join(outpath, "stats.js");
+    bundle = await rollup.rollup({
+        "input": path.join(frontendPath, "src/stats.ts"),
+        "plugins": [typescript({
+            "tsconfig": path.join(frontendPath, "tsconfig.json"),
+            "sourceMap": false,
+            "mapRoot": undefined
+        }),nodeResolve({
+            "browser": true
         })]
     });
     await bundle.write({
@@ -122,12 +168,15 @@ try {
     fs.mkdirSync(tPath_css);
     let tPath_js = path.join(tPath_www, "javascript");
     fs.mkdirSync(tPath_js);
+    let tPath_jslib = path.join(tPath_js, "lib");
+    fs.mkdirSync(tPath_jslib);
     let tPath_icons = path.join(tPath_css, "icons");
     fs.mkdirSync(tPath_icons);
 
     processHTML(tPath_html);
     processCSS(tPath_css);
     processIcons(tPath_icons);
+    processJSLibs(tPath_jslib);
     processFrontendJS(tPath_js).then(() => {
         return processBackendJS(tPath_src);
     }).then(() => {
