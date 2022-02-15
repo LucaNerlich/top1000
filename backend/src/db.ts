@@ -10,8 +10,8 @@ export type PollOption = {
 
 export type PollData = {
 	_id: ObjectId,
-	staffel: number,
-	thema: string,
+	season: number,
+	topic: string,
 	stage: string,
 	created_at: Date,
 	last_posted_at: Date,
@@ -23,6 +23,11 @@ export type PollData = {
 	voters: number,
 	options: PollOption[],
     winner?: number | null
+};
+
+export type PollListItem = {
+    id: ObjectId,
+    title: string
 };
 
 const regex_escape = /[.*+?^${}()|[\]\\]/g;
@@ -100,33 +105,33 @@ export class MongoDB
         return await this.polls.find({ "$or": [ { "stage": "Viertelfinale" } , { "stage": "Halbfinale"}, { "stage": "Finale"}, {"stage": "Achtelfinale"}]}, {"sort": { "created_at": 1}}).toArray() as PollData[];
     }
 
-    public async getStaffelData(id: number): Promise<PollData[]> {
+    public async getSeasonData(id: number): Promise<PollData[]> {
         if(this.polls === undefined) {
             throw new Error("No database connection");
         }
-        const data = await this.polls.find({"staffel": id, "$or": [ { "stage": "Viertelfinale" } , { "stage": "Halbfinale"}, { "stage": "Finale"}, {"stage": "Achtelfinale"}]}, {"sort": { "created_at": 1}}).toArray();
+        const data = await this.polls.find({"season": id, "$or": [ { "stage": "Viertelfinale" } , { "stage": "Halbfinale"}, { "stage": "Finale"}, {"stage": "Achtelfinale"}]}, {"sort": { "created_at": 1}}).toArray();
         if(data.length === 0) {
             throw new InputError("Season not found");
         }
         return data as PollData[];
     }
 
-    public async getPollList(id: string): Promise<PollData[]> {
+    public async getPollList(id: string): Promise<PollListItem[]> {
         if(this.polls === undefined) {
             throw new Error("No database connection");
         }
-        let thema;
+        let topic;
         switch(id) {
             case "bonus": {
-                thema = "Bonusfolgen";
+                topic = "Bonusfolgen";
                 break;
             }
             case "belt": {
-                thema = "Wer hat den Gürtel";
+                topic = "Wer hat den Gürtel";
                 break;
             }
             case "top5": {
-                thema = "Superleague/Top5";
+                topic = "Superleague/Top5";
                 break;
             }
             default: {
@@ -134,7 +139,7 @@ export class MongoDB
             }
         }
         const data = await this.polls.find({
-            "thema": thema
+            "topic": topic
         }, {
             "sort": {
                 "created_at": 1
@@ -148,7 +153,8 @@ export class MongoDB
         if(data.length === 0) {
             throw new InputError("Nothing found.");
         }
-        return data as PollData[];
+        const ret = data as unknown;
+        return ret as PollListItem[];
     }
 
     public async search(input: string, page?: number) {

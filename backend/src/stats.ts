@@ -69,7 +69,7 @@ export class StatsPage {
         if(Number.isNaN(_id)) {
             throw new InputError("Invalid id");
         }
-        const data = await this.db.getStaffelData(_id);
+        const data = await this.db.getSeasonData(_id);
         if(data.length === 0) {
             throw new InputError("Staffel not found");
         }
@@ -80,7 +80,7 @@ export class StatsPage {
         const s_bis = date_last.getDate() + "." + (date_last.getMonth() + 1) + "." + date_last.getFullYear();
         
         const ret: { label: string, time: string, data: JQBracketData } = {
-            "label": data[0].thema,
+            "label": data[0].topic,
             "time": s_von + " bis " + s_bis,
             "data": {
                 "teams": [],

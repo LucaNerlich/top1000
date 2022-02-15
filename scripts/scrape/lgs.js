@@ -24,10 +24,14 @@ function getString(s) {
     r = r.replace(/(<([^>]+)>)/ig, "").trim();
     r = r.replace(/"|\t/g," ");
     r = r.replace(/[ ]+/g," ");
-    if(r.indexOf(",") !== -1) {
-        return "\"" + r + "\"";
+    return r;
+}
+
+function getQString(s) {
+    if(s.indexOf(",") !== -1) {
+        return "\"" + s + "\"";
     } else {
-        return r;
+        return s;
     }
 }
 
@@ -52,31 +56,38 @@ async function start(name) {
             console.log(staffel.name + "...");
             for(const topic of staffel.topics) {
                 const data = await get("t/" + topic.id + ".json", topic.wasted);
-                const polls = [];
+                const posts = [];
                 // check the first few posts for polls by schiff, alt, sofakissen
                 for(let i = 0; i < data.post_stream.posts.length && i < 10; i++) {
-                    const post = data.post_stream.posts[i];
-                    if(i === 0 || post.username === "system" || post.username === "christian.alt" || post.username === "altf4" || post.username === "christianschiffer" || post.username === "Christian.Schiffer" || post.username === "sofakissen") {
-                        if(Array.isArray(data.post_stream.posts[i].polls) && data.post_stream.posts[i].polls.length > 0) {
-                            for(let ii = 0; ii < data.post_stream.posts[i].polls.length; ii++) {
-                                polls.push(data.post_stream.posts[i].polls[ii]);
+                    const cpost = data.post_stream.posts[i];
+                    if(i === 0 || cpost.username === "system" || cpost.username === "christian.alt" || cpost.username === "altf4" || cpost.username === "christianschiffer" || cpost.username === "Christian.Schiffer" || cpost.username === "sofakissen") {
+                        if(Array.isArray(cpost.polls) && cpost.polls.length > 0) {
+                            for(let ii = 0; ii < cpost.polls.length; ii++) {
+                                posts.push({
+                                    "id": cpost.id,
+                                    "poll": cpost.polls[ii]
+                                });
                             }
                         }
                     }
                 }
-                if(polls.length === 0) {
+                if(posts.length === 0) {
                     console.error("didn't find polls for " + staffel.name + " : " + topic.id);
                     continue;
                 }
-                const poll = (topic.poll_index === undefined) ? polls[0] : polls[topic.poll_index];
+                const post = (topic.poll_index === undefined) ? posts[0] : posts[topic.poll_index];
+                const poll = post.poll;
 
                 if(!(Array.isArray(poll.options) && poll.options.length > 1)) {
                     console.error("invalid poll options for " + staffel.name + " : " + topic.id);
                     continue;
                 }
                 const out = {
-                    "staffel": staffel.nr,
-                    "thema": getString(staffel.name),
+                    "wasted": topic.wasted,
+                    "topic_id": topic.id,
+                    "post_id": post.id,
+                    "poll_name": poll.name,
+                    "topic": getString(staffel.name),
                     "stage": getString(topic.stage),
                     "created_at": { "$date": data.created_at },
                     "last_posted_at": { "$date": data.last_posted_at },
@@ -88,11 +99,14 @@ async function start(name) {
                     "voters": poll.voters,
                     "options": []
                 };
-                if(topic.id === 25) {
-                    const lol = true;
+                if(staffel.nr !== undefined) {
+                    out.season = staffel.nr;
+                }
+                if(topic.category !== undefined) {
+                    out.category = topic.category;
                 }
 
-                f.write(out.staffel + "," + out.thema + "," + out.stage + "," + out.created_at.$date + "," + out.last_posted_at.$date + "," + out.posts_count + "," + out.views + "," + out.participant_count + "," + out.like_count + "," + out.word_count + "," + out.voters);
+                f.write(staffel.nr + "," + getQString(out.topic) + "," + getQString(out.stage) + "," + out.created_at.$date + "," + out.last_posted_at.$date + "," + out.posts_count + "," + out.views + "," + out.participant_count + "," + out.like_count + "," + out.word_count + "," + out.voters);
                 if(topic.option1 !== undefined && topic.option2 !== undefined) {
                     if(poll.options.length !== 2) {
                         console.error("invalid poll options for " + staffel.name + " : " + topic.id);
@@ -106,16 +120,27 @@ async function start(name) {
                         "name": getString(topic.option2),
                         "votes": poll.options[1].votes
                     };
-                    f.write("," + opt1.name + "," + opt1.votes + "," + opt2.name + "," + opt2.votes);
+                    f.write("," + getQString(opt1.name) + "," + opt1.votes + "," + getQString(opt2.name) + "," + opt2.votes);
                     out.options.push(opt1);
                     out.options.push(opt2);
                 } else {
+                    if(topic.winner !== undefined) {
+                        let max = 0;
+                        let max_i;
+                        for(let i = 0; i < poll.options.length; i++) {
+                            if(poll.options[i].votes > max) {
+                                max = poll.options[i].votes;
+                                max_i = i;
+                            }
+                        }
+                        poll.options[max_i].name = topic.winner;
+                    }
                     for(const option of poll.options) {
                         const out_opt = {
                             "name": getString(option.html),
                             "votes": option.votes
                         };
-                        f.write("," + out_opt.name + "," + out_opt.votes);
+                        f.write("," + getQString(out_opt.name) + "," + out_opt.votes);
                         out.options.push(out_opt);
                     }
                 }
@@ -138,7 +163,7 @@ async function start(name) {
     console.log("created " + outfile_json);
 }
 
-start("lgstest").then(() => {
+start("lgs").then(() => {
     console.log("done");
 }).catch(exc => {
     console.error(exc); 

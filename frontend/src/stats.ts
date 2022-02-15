@@ -13,6 +13,7 @@ type BracketOptions = {
 
 interface BoostrapCollapse {
     toggle: () => void;
+    hide: () => void;
 }
 
 
@@ -233,7 +234,7 @@ function onMenu(e: Event) {
         }
     }
 
-    cur.obj.menu.toggle();
+    cur.obj.menu.hide();
 }
 
 function onSubMenu(e: Event) {
