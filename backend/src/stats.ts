@@ -70,10 +70,22 @@ export class StatsPage {
             throw new InputError("Invalid id");
         }
         const data = await this.db.getStaffelData(_id);
+        if(data.length === 0) {
+            throw new InputError("Staffel not found");
+        }
+
+        const date_first = data[0].created_at;
+        const date_last = data[data.length - 1].created_at;
+        const s_von = date_first.getDate() + "." + (date_first.getMonth() + 1) + "." + date_first.getFullYear();
+        const s_bis = date_last.getDate() + "." + (date_last.getMonth() + 1) + "." + date_last.getFullYear();
         
-        const ret: JQBracketData = {
-            "teams": [],
-            "results": []
+        const ret: { label: string, time: string, data: JQBracketData } = {
+            "label": data[0].thema,
+            "time": s_von + " bis " + s_bis,
+            "data": {
+                "teams": [],
+                "results": []
+            }
         };
 
         const rounds_data: PollData[][] = [
@@ -144,7 +156,7 @@ export class StatsPage {
             let v1, v2;
             for(let ii = 0; ii < rounds_sorted[i].length; ii++) {
                 if(i === 0) {
-                    ret.teams.push([rounds_sorted[0][ii].options[0].name, rounds_sorted[0][ii].options[1].name]);
+                    ret.data.teams.push([rounds_sorted[0][ii].options[0].name, rounds_sorted[0][ii].options[1].name]);
                     v1 = rounds_sorted[0][ii].options[0].votes;
                     v2 = rounds_sorted[0][ii].options[1].votes;
                 } else {
@@ -159,7 +171,7 @@ export class StatsPage {
                 }
                 temp_res.push([v1,v2,rounds_sorted[i][ii].winner]);
             }
-            ret.results.push(temp_res);
+            ret.data.results.push(temp_res);
         }
 
         return ret;

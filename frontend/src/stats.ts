@@ -2,17 +2,6 @@
 import axios from "redaxios";
 import Chart from "chart.js/auto";
 
-declare global {
-    interface JQuery {
-        bracket(arg: BracketOptions): JQuery;
-    }
-    interface Window {
-        feather: {
-            replace: ()=>void
-        }
-    }
-}
-
 type BracketOptions = {
     init: {[key: string]: unknown},
     skipConsolationRound: boolean,
@@ -21,6 +10,28 @@ type BracketOptions = {
     matchMargin: number,
     roundMargin: number
 };
+
+interface BoostrapCollapse {
+    toggle: () => void;
+}
+
+
+declare global {
+    interface JQuery {
+        bracket(arg: BracketOptions): JQuery;
+        collapse(arg: string): void;
+    }
+    interface Window {
+        feather: {
+            replace: ()=>void
+        },
+        bootstrap: {
+            Collapse: new(el: HTMLElement, opt: any) => BoostrapCollapse;
+        }
+    }
+}
+
+
 
 enum Menu {
     LGS_OVERVIEW,
@@ -43,6 +54,7 @@ type Current = {
     charttype: ChartType,
     chartid: string
     obj: {
+        menu: BoostrapCollapse,
         chart?: Chart
     }
 };
@@ -75,7 +87,9 @@ const cur: Current = {
     "charttype": ChartType.BAR,
     "chartid": "",
     "submenu": 0,
-    "obj": {}
+    "obj": {
+        "menu": new window.bootstrap.Collapse(element.menu, { "toggle": false })
+    }
 };
 
 async function httpRequest(url: string) {
@@ -218,6 +232,8 @@ function onMenu(e: Event) {
             break;
         }
     }
+
+    cur.obj.menu.toggle();
 }
 
 function onSubMenu(e: Event) {
@@ -303,9 +319,13 @@ function setupLGSChart(id: number) {
 }
 
 function setupLGSStaffel(id: number) {
-    httpRequest("stats/api?type=bracket&id=" + id).then(data => {
-        $("#bracket").bracket({
-            init: data,
+    httpRequest("stats/api?type=bracket&id=" + id).then(ret => {
+        const el_title = element.bracket.children[0] as HTMLElement;
+        const el_time = element.bracket.children[1] as HTMLElement;
+        el_title.innerHTML = ret.label;
+        el_time.innerHTML = ret.time;
+        $(element.bracket.children[2]).bracket({
+            init: ret.data,
             skipConsolationRound: true,
             teamWidth: 160,
             scoreWidth: 37,
