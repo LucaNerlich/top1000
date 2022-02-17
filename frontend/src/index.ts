@@ -1,4 +1,48 @@
 
+type PlatformData = {
+    first_release_date: string,
+    platform_id: number,
+    platform_name: string
+}
+
+type ResultItem = {
+    id: string,
+    text: string,
+    date: string,
+    image?: string,
+    platforms: PlatformData[]
+}
+
+// eslint-disable-next-line
+declare module Select2 {
+    interface DataFormat {
+        date: string,
+        image?: string,
+        platforms: PlatformData[]
+    }
+}
+
+function getLabel(item: ResultItem) {
+    if(item.platforms !== undefined) {
+        let temp;
+        let date = 99999;
+        let platforms = "";
+        for(let i = 0; i < item.platforms.length; i++) {
+            temp = parseInt(item.platforms[i].first_release_date.substring(0,4));
+            if(!Number.isNaN(temp) && temp < date) {
+                date = temp;
+            }
+            if(i > 0) {
+                platforms += ", ";
+            }
+            platforms += item.platforms[i].platform_name;
+        }
+        return item.text + " (" + date + ") [" + platforms + "]";
+    } else {
+        return item.text;
+    }
+}
+
 window.addEventListener("load", () => {
     $("#main select").select2({
         "ajax": {
@@ -10,6 +54,17 @@ window.addEventListener("load", () => {
                     "page": params.page !== undefined ? params.page : 1
                 }
             }
+        },
+        "templateResult": (data) => {
+            const item = data as ResultItem;
+            if(typeof item.image === "string" && item.image.length > 0) {
+                return $("<div class=\"select_item\"><img src=\"" + item.image + "\"/><span>" + getLabel(item) + "</span></div>")
+            } else {
+                return getLabel(item);
+            }
+        },
+        "templateSelection": (data) => {
+            return getLabel(data as ResultItem);
         }
     });
 

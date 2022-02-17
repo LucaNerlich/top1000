@@ -27,7 +27,8 @@ export type PollData = {
 
 export type PollListItem = {
     id: ObjectId,
-    title: string
+    title: string,
+    date: Date
 };
 
 const regex_escape = /[.*+?^${}()|[\]\\]/g;
@@ -147,7 +148,8 @@ export class MongoDB
             "projection": {
                 "_id": 0,
                 "id": "$_id",
-                "title": "$stage"
+                "title": "$stage",
+                "date": "$created_at"
             }
         }).toArray();
         if(data.length === 0) {
@@ -155,6 +157,21 @@ export class MongoDB
         }
         const ret = data as unknown;
         return ret as PollListItem[];
+    }
+
+    public async getBeltHolders() {
+        if(this.polls === undefined) {
+            throw new Error("No database connection");
+        }
+        const data = await this.polls.find({
+            "topic": "Wer hat den Gürtel",
+            "category": 0
+        }, {
+            "sort": {
+                "created_at": 1
+            }
+        }).toArray();
+        return data;
     }
 
     public async search(input: string, page?: number) {
@@ -168,9 +185,9 @@ export class MongoDB
 
         const res = await this.games.aggregate([
             { "$match": {
-                "name": new RegExp(input.replace(regex_escape, "\\$&"),"gi")
+                "title": new RegExp(input.replace(regex_escape, "\\$&"),"gi")
             } },
-            { "$sort": { "name": 1 } },
+            { "$sort": { "title": 1 } },
             { "$facet": {
                 "metadata": [ { "$count": "total" } ],
                 "data": [
@@ -179,7 +196,9 @@ export class MongoDB
                     { "$project": {
                         "_id": 0,
                         "id": { "$toString": "$_id" },
-                        "text": "$name"
+                        "text": "$title",
+                        "image": "$sample_cover.thumbnail_image",
+                        "platforms": "$platforms"
                     } }
                 ]
             } }

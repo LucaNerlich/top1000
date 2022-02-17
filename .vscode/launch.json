@@ -24,7 +24,7 @@
             "name": "debugscript",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",            
-            "program": "${workspaceFolder}/scripts/scrape/lgs.js",
+            "program": "${workspaceFolder}/scripts/scrape/mobygames_api.js",
             "request": "launch",
             "restart": true,
             "runtimeExecutable": "node",

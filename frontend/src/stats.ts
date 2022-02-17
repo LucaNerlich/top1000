@@ -16,7 +16,6 @@ interface BoostrapCollapse {
     hide: () => void;
 }
 
-
 declare global {
     interface JQuery {
         bracket(arg: BracketOptions): JQuery;
@@ -27,12 +26,10 @@ declare global {
             replace: ()=>void
         },
         bootstrap: {
-            Collapse: new(el: HTMLElement, opt: any) => BoostrapCollapse;
+            Collapse: new(el: HTMLElement, opt: {[key: string]: unknown}) => BoostrapCollapse;
         }
     }
 }
-
-
 
 enum Menu {
     LGS_OVERVIEW,
@@ -221,7 +218,7 @@ function onMenu(e: Event) {
             element.bracket.classList.remove("hidden");
             break;
         }
-        case Menu.LGS_BONUS: case Menu.BELT: case Menu.TOP5: {
+        case Menu.LGS_BONUS: case Menu.TOP5: case Menu.BELT: {
             setSubmenuSwitch(true);
             if(cur.charttype === ChartType.PIE) {
                 setupPieChart(first_id as string);
@@ -297,15 +294,15 @@ function setupLGSChart(id: number) {
             "type": "line",
             "data": ret.data,
             "options": {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
+                "responsive": true,
+                "interaction": {
+                    "mode": 'index',
+                    "intersect": false,
                 },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            afterTitle: (context: any) => {
+                "plugins": {
+                    "tooltip": {
+                        "callbacks": {
+                            "afterTitle": (context: any) => {
                                 const i = context[0].dataIndex;
                                 return ret.labels[i];
                             }
@@ -409,7 +406,7 @@ window.addEventListener("load", () => {
         link._menu = i;
     }
     for(let i = 0; i < element.submenu_switch.children.length; i++) {
-        const btn = element.submenu_switch.children[i].addEventListener("click", onChartSwitch);
+        element.submenu_switch.children[i].addEventListener("click", onChartSwitch);
     }
     changeSubmenu(Menu.LGS_OVERVIEW);
     setupLGSChart(1);

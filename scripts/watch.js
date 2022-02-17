@@ -114,6 +114,25 @@ watch_files.on("add", onChangeFile);
 watch_files.on("change", onChangeFile);
 watch_files.on("unlink", onDeleteFile);
 
+// frontend index
+const index_out_file = path.join(folder.debug_js, "index.js");
+const index_in_file = path.join(folder.frontend, "src/index.ts");
+const index_watcher = rollup.watch({
+    "input": index_in_file,
+    "plugins": [typescript({
+        "tsconfig": path.join(folder.frontend, "tsconfig.json"),
+        "sourceMap": false
+    }),nodeResolve({
+        "browser": true
+    })],
+    "output": {
+        "file": index_out_file,
+        "format": "iife",
+        "sourcemap": true
+    }
+});
+console.log("watching " + index_in_file);
+
 // frontend/stats
 const stats_out_file = path.join(folder.debug_js, "stats.js");
 const stats_in_file = path.join(folder.frontend, "src/stats.ts");

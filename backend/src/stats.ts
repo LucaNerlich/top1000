@@ -260,9 +260,66 @@ export class StatsPage {
             const month = data[i].created_at.getMonth() + 1;
             const day = data[i].created_at.getDate();
             const date = day + "." + month + "." + year;
-            ret.labels.push([data[i].thema + ": " + data[i].stage, data[i].options[0].name + " (" + data[i].options[0].votes + ") vs " + data[i].options[1].name + " (" + data[i].options[1].votes + ")"]);
+            ret.labels.push([data[i].topic + ": " + data[i].stage, data[i].options[0].name + " (" + data[i].options[0].votes + ") vs " + data[i].options[1].name + " (" + data[i].options[1].votes + ")"]);
             ret.data.labels.push(date);
         }
         return ret;
+    }
+
+    private async getTimeline() {
+        const data = await this.db.getBeltHolders();
+        const datasets = [];
+        const labels = [];
+        const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+        const offset = data[0].created_at.getFullYear() * 12 + data[0].created_at.getMonth();
+        let startdate = 0;
+        let curdate;
+
+        let title;
+        let votes = 0;
+        for(const option of data[0].options) {
+            if(option.votes > votes) {
+                votes = option.votes;
+                title = option.name;
+            }
+        }
+        for(let i = 1; i < data.length; i++) {
+            let ctitle;
+            votes = 0;
+            for(const option of data[i].options) {
+                if(option.votes > votes) {
+                    votes = option.votes;
+                    ctitle = option.name;
+                }
+            }
+
+
+            if(ctitle !== title) {
+                curdate = (data[i].created_at.getFullYear() * 12 + data[i].created_at.getMonth()) - offset;
+                datasets.push({
+                    label: title,
+                    data: [
+                        [startdate, curdate]
+                    ],
+                    backgroundColor: StatsPage.colorlist[i],
+                    barPercentage: 2,
+                    barThickness: 8,
+                    maxBarThickness: 10,
+                    minBarLength: 50,
+                });
+                title = ctitle;
+                startdate = curdate;
+                labels.push(months[data[i].created_at.getMonth()] + " " + data[i].created_at.getFullYear());
+            }            
+        }
+        return {
+            "data": {
+                "datasets": datasets,
+                "labels": [""]
+            },
+            "labels": labels,
+            "max": curdate
+        };
     }
 }

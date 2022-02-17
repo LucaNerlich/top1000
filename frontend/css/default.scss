@@ -44,6 +44,22 @@ h1 {
     text-align: center;
 }
 
+
+.select_item {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    img {
+        order: 1;
+        max-height: 3rem;
+        max-width: 6rem;
+    }
+    span {
+        order: 2;
+        padding-left: 1rem;
+    }
+}
+
 .game {
     margin-top: 3px;
 
