@@ -33,6 +33,10 @@ router.get("/", (req: express.Request, res: express.Response) => {
     }    
 });
 
+router.get("/list", (req: express.Request, res: express.Response) => {
+    res.type("html").sendFile(path_list);
+});
+
 router.post("/", async(req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         const gender = req.body.gender;
@@ -84,7 +88,7 @@ router.post("/", async(req: express.Request, res: express.Response, next: expres
     }
 });
 
-router.get("/list", async(req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.get("/api/list", async(req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         if(typeof req.query.page !== "string") {
             throw new Error("Missing page");
@@ -116,7 +120,7 @@ router.get("/list", async(req: express.Request, res: express.Response, next: exp
     }
 });
 
-router.get("/search", async(req: express.Request, res: express.Response, next: express.NextFunction) => {
+router.get("/api/search", async(req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         const term = req.query.search;
         const page = req.query.page;
@@ -147,6 +151,9 @@ db.connect().then(() => {
         "secret": "ajrgn35negkjndg",
         "resave": false,
         "saveUninitialized": false,
+        "cookie": {
+            "maxAge": 1000 * 60 * 60 * 24
+        }
     }));
     app.use("/", router);
     app.use("/stats", stats.getRouter());

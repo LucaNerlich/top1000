@@ -50,7 +50,7 @@ function setupSelect2() {
     // Create select2s
     $(".game select").select2({
         "ajax": {
-            "url": "/search",
+            "url": "/api/search",
             "dataType": "json",
             "data": (params) => {
                 // returns GET params send to server

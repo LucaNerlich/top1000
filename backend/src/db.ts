@@ -158,8 +158,8 @@ export class MongoDB
                     { "$sort": {
                         "rank": -1
                     }},
-                    { "$skip": (page - 1) * 10 },
-                    { "$limit": 10 },
+                    { "$skip": (page - 1) * 20 },
+                    { "$limit": 20 },
                     { "$lookup": {
                         "from": "games",
                         "localField": "_id",
@@ -184,8 +184,8 @@ export class MongoDB
 
         return {
             "data": ret.data,
-            "pages": Math.ceil(count / 10),
-            "limit": 10
+            "pages": Math.ceil(count / 20),
+            "limit": 20
         };
     }
 

@@ -37,7 +37,7 @@ entry_template.className = "game";
 let current_game: HTMLElement | undefined = undefined;
 
 async function getListData(page = 1) {
-    const ret = await axios.get("/list?page=" + page + getFilterString());
+    const ret = await axios.get("/api/list?page=" + page + getFilterString());
     if(ret.status === 200) {
         return ret.data;
     } else {
