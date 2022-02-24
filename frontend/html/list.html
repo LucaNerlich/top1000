@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wasted Top1000</title>
+    <link rel="stylesheet" href="css/lib/bootstrap.min.css" >
+    <link rel="stylesheet" href="css/list.css" />
+    <script src="javascript/lib/bootstrap.min.js"></script>
+    <script src="javascript/list.js" type="module"></script>
+  </head>
+  <body>
+    <div id="background"></div>
+    <div class="container-lg" id="main">
+      <div id="mask" class="hidden"></div>
+      <button id="btnFilter" class="icon-menu"></button>
+      <h1>Wasted Top1000</h1>
+      <div id="filter" class="hidden">
+        <div class="row mb-3">
+          <label class="col-sm-6 col-form-label" for="genderSelect">Geschlecht</label>
+          <div class="col-sm-6">
+            <select class="form-select" id="genderSelect" name="gender">
+              <option value="" selected>Egal</option>
+              <option value="female">Weiblich</option>
+              <option value="male">Männlich</option>
+              <option value="other">Divers</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <label class="col-sm-6 col-form-label" for="ageSelect">Altersgruppe</label>
+          <div class="col-sm-6">
+            <select class="form-select" id="ageSelect" name="age">
+              <option value="0" selected>Egal</option>
+              <option value="1">0 - 10 Jahre</option>
+              <option value="2">11 - 20 Jahre</option>
+              <option value="3">21 - 30 Jahre</option>
+              <option value="4">31 - 40 Jahre</option>
+              <option value="5">41 - 50 Jahre</option>
+              <option value="6">51 - 60 Jahre</option>
+              <option value="7">61 - 70 Jahre</option>
+              <option value="8">71 - 80 Jahre</option>
+              <option value="9">81 - 90 Jahre</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-sm-6">Gruppen</div>
+          <div class="col-sm-6" id="filter_groups">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="checkGroupAll" name="group" value="" checked>
+              <label class="form-check-label" for="checkGroupAll">Alle</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="checkGroupGamer" name="group" value="gamer">
+              <label class="form-check-label" for="checkGroupGamer">Hobbygamer:innen</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="checkGroupJournalist" name="group" value="journalist">
+              <label class="form-check-label" for="checkGroupJournalist">Journalist:innen</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="checkGroupScientist" name="group" value="scientist">
+              <label class="form-check-label" for="checkGroupScientist">Wissenschaftler:innen</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="checkGroupCritic" name="group" value="critic">
+              <label class="form-check-label" for="checkGroupCritic">Spielekritiker:innen</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="checkGroupWasted" name="group" value="wasted">
+              <label class="form-check-label" for="checkGroupWasted">Wastedmitglieder:innen</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="nogames" class="hidden">Keine Einträge gefunden :(</div>
+      <div id="games"></div>
+      <div id="pages"></div>
+      <div class="footer"></div>
+    </div>
+  </body>
+</html>

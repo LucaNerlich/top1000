@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wasted Top1000</title>
+    <link rel="stylesheet" href="css/lib/bootstrap.min.css" >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="css/vote.css" />
+    <script src="javascript/lib/jquery.min.js"></script>
+    <script src="javascript/lib/bootstrap.min.js"></script>
+    <script src="javascript/lib/select2.min.js"></script>
+    <script src="javascript/vote.js" type="module"></script>
+  </head>
+  <body>
+    <div id="background"></div>
+    <div class="container-lg" id="main">
+      <form action="/" method="post" id="form">
+        <h1>Wasted Top1000</h1>
+        <div id="slide1" class="slide">
+          <span class="step">1/4</span>
+          <div class="help">
+            Hallo! Willkommen zur Abstimmung über die Wasted Top1000! Gefragt sind deine persönlichen Top-30 Videospiele, du solltest dir also durchaus etwas Zeit nehmen. Zunächst aber ein paar (freiwillige) Angaben zu  deiner Person.
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-6 col-form-label" for="genderSelect">Welchem Geschlecht fühlst du dich zugehörig?</label>
+            <div class="col-sm-6">
+              <select class="form-select" id="genderSelect" name="gender">
+                <option value="" selected>Keine Angabe...</option>
+                <option value="female">Weiblich</option>
+                <option value="male">Männlich</option>
+                <option value="other">Divers</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <label class="col-sm-6 col-form-label" for="ageSelect">Welcher Altersgruppe gehörst du an?</label>
+            <div class="col-sm-6">
+              <select class="form-select" id="ageSelect" name="age">
+                <option value="0" selected>Keine Angabe...</option>
+                <option value="1">0 - 10 Jahre</option>
+                <option value="2">11 - 20 Jahre</option>
+                <option value="3">21 - 30 Jahre</option>
+                <option value="4">31 - 40 Jahre</option>
+                <option value="5">41 - 50 Jahre</option>
+                <option value="6">51 - 60 Jahre</option>
+                <option value="7">61 - 70 Jahre</option>
+                <option value="8">71 - 80 Jahre</option>
+                <option value="9">81 - 90 Jahre</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-6">Welcher Gruppe gehörst du an?</div>
+            <div class="col-sm-6">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkGroupHobby" value="gamer" name="gamer">
+                <label class="form-check-label" for="checkGroupHobby">Hobbygamer:in</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkGroupJournalist" value="journalist" name="journalist">
+                <label class="form-check-label" for="checkGroupJournalist">Journalist:in</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkGroupWissenschaft" value="scientist" name="scientist">
+                <label class="form-check-label" for="checkGroupWissenschaft">Wissenschaftler:in</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="checkGroupKritiker" value="critic" name="critic">
+                <label class="form-check-label" for="checkGroupKritiker">Spielekritiker:in</label>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-sm-6">Bist du Teil der WASTED Community?</div>
+            <div class="col-sm-6">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="wasted" value="yes" id="flexRadioDefault1" checked>
+                <label class="form-check-label" for="flexRadioDefault1">
+                  Ich bin totally wasted.
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="wasted" value="no" id="flexRadioDefault2">
+                <label class="form-check-label" for="flexRadioDefault2">
+                  Ich bin kein Teil der WASTED Community
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="slide_buttons">
+            <button type="button" class="btn btn-primary" value="next">Weiter</button>
+          </div>
+          <div class="footer"></div>
+        </div>
+        <div id="slide2" class="slide hidden">
+          <span class="step">2/4</span>
+          <div class="help">
+            Wähle jetzt deine Top-10 Videospiele aller Zeiten. Bitte achte darauf keine Spezialeditionen (z.B. Limited Collectors Edtion etc.) zu wählen, sondern wo möglich das Grundspiel in seiner Urfassung. Wenn du zu einem Spiel einen kurzen Kommentar hinterlassen möchtest, klicke auf den Button rechts neben dem Dropdown-Menü.
+            <span class="error hidden" id="slide2_error">Bitte fülle das Formular vollständig aus!</span>
+          </div>
+          <div class="game" data-index="1">
+            <div>
+              <div><span>1.</span></div>
+              <div><select name="game1" id="game1" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game1_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="2">
+            <div>
+              <div><span>2.</span></div>
+              <div><select name="game2" id="game2" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game2_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="3">
+            <div>
+              <div><span>3.</span></div>
+              <div><select name="game3" id="game3" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game3_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="4">
+            <div>
+              <div><span>4.</span></div>
+              <div><select name="game4" id="game4" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game4_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="5">
+            <div>
+              <div><span>5.</span></div>
+              <div><select name="game5" id="game5" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game5_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="6">
+            <div>
+              <div><span>6.</span></div>
+              <div><select name="game6" id="game6" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game6_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="7">
+            <div>
+              <div><span>7.</span></div>
+              <div><select name="game7" id="game7" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game7_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="8">
+            <div>
+              <div><span>8.</span></div>
+              <div><select name="game8" id="game8" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game8_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="9">
+            <div>
+              <div><span>9.</span></div>
+              <div><select name="game9" id="game9" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game9_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="10">
+            <div>
+              <div><span>10.</span></div>
+              <div><select name="game10" id="game10" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game10_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="slide_buttons">
+            <button type="button" class="btn btn-secondary" value="back">Zurück</button>
+            <button type="button" class="btn btn-primary" value="next">Weiter</button>
+          </div>
+          <div class="footer"></div>
+        </div>
+        <div id="slide3" class="slide hidden">
+          <span class="step">3/4</span>
+          <div class="help">
+            Weiter geht es: Die Spiele 11 bis 20 auf deiner ewigen Bestenliste!
+            <span class="error hidden" id="slide3_error">Bitte fülle das Formular vollständig aus!</span>
+          </div>
+          <div class="game" data-index="11">
+            <div>
+              <div><span>11.</span></div>
+              <div><select name="game11" id="game11" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game11_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="12">
+            <div>
+              <div><span>12.</span></div>
+              <div><select name="game12" id="game12" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game12_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="13">
+            <div>
+              <div><span>13.</span></div>
+              <div><select name="game13" id="game13" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game13_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="14">
+            <div>
+              <div><span>14.</span></div>
+              <div><select name="game14" id="game14" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game14_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="15">
+            <div>
+              <div><span>15.</span></div>
+              <div><select name="game15" id="game15" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game15_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="16">
+            <div>
+              <div><span>16.</span></div>
+              <div><select name="game16" id="game16" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game16_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="17">
+            <div>
+              <div><span>17.</span></div>
+              <div><select name="game17" id="game17" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game17_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="18">
+            <div>
+              <div><span>18.</span></div>
+              <div><select name="game18" id="game18" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game18_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="19">
+            <div>
+              <div><span>19.</span></div>
+              <div><select name="game19" id="game19" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game19_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="20">
+            <div>
+              <div><span>20.</span></div>
+              <div><select name="game20" id="game20" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game20_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="slide_buttons">
+            <button type="button" class="btn btn-secondary" value="back">Zurück</button>
+            <button type="button" class="btn btn-primary" value="next">Weiter</button>
+          </div>
+          <div class="footer"></div>
+        </div>
+        <div id="slide4" class="slide hidden">
+          <span class="step">4/4</span>
+          <div class="help">
+            Fast geschafft! Nur noch zehn weitere Spiele...
+            <span class="error hidden" id="slide4_error">Bitte fülle das Formular vollständig aus!</span>
+          </div>
+          <div class="game" data-index="21">
+            <div>
+              <div><span>21.</span></div>
+              <div><select name="game21" id="game21" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game21_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="22">
+            <div>
+              <div><span>22.</span></div>
+              <div><select name="game22" id="game22" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game22_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="23">
+            <div>
+              <div><span>23.</span></div>
+              <div><select name="game23" id="game23" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game23_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="24">
+            <div>
+              <div><span>24.</span></div>
+              <div><select name="game24" id="game24" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game24_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="25">
+            <div>
+              <div><span>25.</span></div>
+              <div><select name="game25" id="game25" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game25_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="26">
+            <div>
+              <div><span>26.</span></div>
+              <div><select name="game26" id="game26" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game26_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="27">
+            <div>
+              <div><span>27.</span></div>
+              <div><select name="game27" id="game27" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game27_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="28">
+            <div>
+              <div><span>28.</span></div>
+              <div><select name="game28" id="game28" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game28_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="29">
+            <div>
+              <div><span>29.</span></div>
+              <div><select name="game29" id="game29" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game29_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="game" data-index="30">
+            <div>
+              <div><span>30.</span></div>
+              <div><select name="game30" id="game30" style="width: 100%; height: 100%"></select></div>
+              <div><button type="button" class="btn_expand_more"></button></div>
+            </div>
+            <div class="hidden">
+              <div></div>
+              <div><textarea name="game30_comment"></textarea></div>
+            </div>
+          </div>
+          <div class="slide_buttons">
+            <button type="button" class="btn btn-secondary" value="back">Zurück</button>
+            <button type="button" class="btn btn-vote" id="btnSubmit">Abschicken!</button>
+          </div>
+          <div class="footer"></div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

@@ -1,9 +1,6 @@
 const path = require("path");
 const chokidar = require("chokidar");
-const { copyFileSync, unlinkSync, mkdirSync, readdirSync } = require("fs");
-const rollup = require('rollup');
-const typescript = require("@rollup/plugin-typescript");
-const { nodeResolve } = require("@rollup/plugin-node-resolve");
+const { copyFileSync, unlinkSync, mkdirSync } = require("fs");
 
 const folder = {
     "root": path.join(__dirname, ".."),
@@ -113,41 +110,3 @@ console.log("watching \"" + folder.jslib + "\"...");
 watch_files.on("add", onChangeFile);
 watch_files.on("change", onChangeFile);
 watch_files.on("unlink", onDeleteFile);
-
-// frontend index
-const index_out_file = path.join(folder.debug_js, "index.js");
-const index_in_file = path.join(folder.frontend, "src/index.ts");
-const index_watcher = rollup.watch({
-    "input": index_in_file,
-    "plugins": [typescript({
-        "tsconfig": path.join(folder.frontend, "tsconfig.json"),
-        "sourceMap": false
-    }),nodeResolve({
-        "browser": true
-    })],
-    "output": {
-        "file": index_out_file,
-        "format": "iife",
-        "sourcemap": true
-    }
-});
-console.log("watching " + index_in_file);
-
-// frontend/stats
-const stats_out_file = path.join(folder.debug_js, "stats.js");
-const stats_in_file = path.join(folder.frontend, "src/stats.ts");
-const stats_watcher = rollup.watch({
-    "input": stats_in_file,
-    "plugins": [typescript({
-        "tsconfig": path.join(folder.frontend, "tsconfig.json"),
-        "sourceMap": false
-    }),nodeResolve({
-        "browser": true
-    })],
-    "output": {
-        "file": stats_out_file,
-        "format": "iife",
-        "sourcemap": true
-    }
-});
-console.log("watching " + stats_in_file);

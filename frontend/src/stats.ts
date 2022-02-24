@@ -1,6 +1,7 @@
-
-import axios from "redaxios";
-import Chart from "chart.js/auto";
+// chart.min.d.ts is a slightly modified version of DefinitelyTyped Type definitions for Chart.js 2.9.
+// redaxios.min.d.ts is index.d.ts from axios 0.26.0
+import "./lib/chart.min.js"
+import axios from "./lib/redaxios.min.js"
 
 type BracketOptions = {
     init: {[key: string]: unknown},
@@ -290,13 +291,13 @@ function setupLGSChart(id: number) {
         cur.obj.chart.destroy();
     }
     httpRequest("stats/api?type=chart&id=lgs" + id).then(ret => {
-        cur.obj.chart = new Chart(element.chart, {
+        cur.obj.chart = new window.Chart(element.chart, {
             "type": "line",
             "data": ret.data,
             "options": {
                 "responsive": true,
                 "interaction": {
-                    "mode": 'index',
+                    "mode": "index",
                     "intersect": false,
                 },
                 "plugins": {
@@ -340,7 +341,7 @@ function setupPieChart(id: string) {
         cur.obj.chart.destroy();
     }
     httpRequest("stats/api?type=pie&id=" + id).then(ret => {
-        cur.obj.chart = new Chart(element.chart, {
+        cur.obj.chart = new window.Chart(element.chart, {
             "type": "pie",
             "data": ret.data,
             "options": {
@@ -367,7 +368,7 @@ function setupBarChart(id: string) {
         cur.obj.chart.destroy();
     }
     httpRequest("stats/api?type=pie&id=" + id).then(ret => {
-        cur.obj.chart = new Chart(element.chart, {
+        cur.obj.chart = new window.Chart(element.chart, {
             "type": "bar",
             "data": ret.data,
             "options": {

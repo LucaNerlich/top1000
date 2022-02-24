@@ -1,7 +1,21 @@
 import MongoStore from "connect-mongo";
 import { Store as SessionStore } from "express-session";
-import { MongoClient, ReadPreference, Collection, MongoClientOptions, ObjectId } from "mongodb";
+import { MongoClient, ReadPreference, Collection, MongoClientOptions, ObjectId, Document } from "mongodb";
 import { InputError } from "./exceptions";
+
+export type VoterGroups = {
+    gamer?: boolean,
+    journalist?: boolean,
+    scientist?: boolean,
+    critic?: boolean,
+    wasted?: boolean
+};
+
+export type VoteGame = {
+    id: string,
+    position: number,
+    comment: string
+};
 
 export type PollOption = {
 	name: string,
@@ -38,6 +52,7 @@ export class MongoDB
     private client: MongoClient | undefined;
     private games: Collection | undefined;
     private polls: Collection | undefined;
+    private votes: Collection | undefined;
 
     public async connect(): Promise<void> {
         const url = process.env.MDB_TOP1000;
@@ -55,6 +70,7 @@ export class MongoDB
             await db.command({ ping: 1 });
             this.games = db.collection("games");
             this.polls = db.collection("polls");
+            this.votes = db.collection("votes");
             console.log("Connected to mongodb server");
         } catch(err) {
             await this.close();
@@ -81,6 +97,96 @@ export class MongoDB
                 }
             });
         }
+    }
+
+    public async insertVote(gender: string, age: number, groups: VoterGroups, games: VoteGame[]) {
+        if(this.votes === undefined) {
+            throw new Error("No database connection");
+        }
+        const query: Document[] = [];
+        for(let i = 0; i < games.length; i++) {
+            const vote: Document = {
+                "groups": groups,
+                "game": ObjectId.createFromHexString(games[i].id),
+                "position": games[i].position
+            };
+            if(gender === "female" || gender === "male" || gender === "other") {
+                vote.gender = gender;
+            }
+            if(Number.isInteger(age) && age > 0 && age < 10) {
+                vote.age = age;
+            }
+            if(games[i].comment.length > 0 && games[i].comment.length <= 4096) {
+                vote.comment = games[i].comment;
+            }
+            query.push(vote);
+        }
+        const ret = await this.votes.insertMany(query);
+        if(ret.acknowledged === false || ret.insertedCount !== games.length) {
+            throw new Error("Failed to insert vote");
+        }
+    }
+
+    public async getList(page: number, gender?: "female" | "male" | "other", age?: number, group?: "gamer" | "journalist" | "critic" | "scientist" | "wasted") {
+        if(this.votes === undefined) {
+            throw new Error("No database connection");
+        }
+        if(!(Number.isInteger(page) && page > 0)) {
+            throw new Error("Invalid page");
+        }
+        const query: Document = {};
+        if(gender !== undefined) {
+            query.gender = gender;
+        }
+        if(age !== undefined) {
+            query.age = age;
+        }
+        if(group !== undefined) {
+            query["groups." + group] = true;
+        }
+        const ret = await this.votes.aggregate([
+            { "$match": query },
+            { "$group": {
+                "_id": "$game",
+                "rank": { "$sum": { "$subtract": [10.3103448275862, { "$multiply": [0.3103448275862, "$position"]}] } },
+                "comments": { "$push": "$comment" },
+                "votes" : { "$sum": 1 }
+            } },
+            { "$facet": {
+                "meta": [ { "$count": "total" } ],
+                "data": [
+                    { "$sort": {
+                        "rank": -1
+                    }},
+                    { "$skip": (page - 1) * 10 },
+                    { "$limit": 10 },
+                    { "$lookup": {
+                        "from": "games",
+                        "localField": "_id",
+                        "foreignField": "_id",
+                        "as": "game"
+                    } },
+                    { "$project": {
+                        "rank": "$rank",
+                        "votes": "$votes",
+                        "game": { "$arrayElemAt": [ "$game", 0 ] },
+                        "comments": "$comments"
+                    } }
+                ]
+            } }
+        ]).next();
+
+        if(ret === null) {
+            throw new Error("Failed to get list");
+        }
+
+        const count = (Array.isArray(ret.meta) && ret.meta.length === 1 && typeof ret.meta[0].total === "number") ? ret.meta[0].total : 0;
+
+        return {
+            "data": ret.data,
+            "pages": Math.ceil(count / 10),
+            "limit": 10
+        };
     }
 
     public async getPollData(id: string): Promise<PollData> {
@@ -219,6 +325,5 @@ export class MongoDB
                 }
             }
         }
-
     }
 }

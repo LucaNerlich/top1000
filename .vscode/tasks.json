@@ -17,6 +17,19 @@
             ]
         },
         {
+            "label": "watch_frontend_ts",
+            "type": "shell",
+            "command": "npx tsc -b frontend --watch",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$tsc-watch"
+            ]
+        },
+        {
             "label": "watch_css",
             "type": "shell",
             "command": "npx sass --watch ./frontend/css:./debug/www/css",
@@ -44,6 +57,7 @@
             "label": "watch",
             "dependsOn": [
                 "watch_backend_ts",
+                "watch_frontend_ts",
                 "watch_css",
                 "watch_frontend"
             ],

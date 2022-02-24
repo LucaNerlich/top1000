@@ -5,7 +5,6 @@ const rollup = require("rollup");
 const terser = require("rollup-plugin-terser");
 const typescript = require("@rollup/plugin-typescript");
 const sass = require("sass");
-const { nodeResolve } = require("@rollup/plugin-node-resolve");
 
 const rootPath = path.join(__dirname, "..");
 const releasePath = path.join(rootPath, "built");
@@ -85,48 +84,33 @@ function processJSLibs(outpath) {
 }
 
 async function processFrontendJS(outpath) {
-    let tFile = path.join(outpath, "index.js");
-    let bundle = await rollup.rollup({
-        "input": path.join(frontendPath, "src/index.ts"),
-        "plugins": [typescript({
-            "tsconfig": path.join(frontendPath, "tsconfig.json"),
-            "sourceMap": false,
-            "mapRoot": undefined
-        })]
-    });
-    await bundle.write({
-        "file": tFile,
-        "format": "iife",
-        "plugins": [terser.terser({
-            "format": {
-                "comments": false
-            }
-        })],
-        "sourcemap": false
-    });
-    console.log("created \"" + tFile + "\"");
-    tFile = path.join(outpath, "stats.js");
-    bundle = await rollup.rollup({
-        "input": path.join(frontendPath, "src/stats.ts"),
-        "plugins": [typescript({
-            "tsconfig": path.join(frontendPath, "tsconfig.json"),
-            "sourceMap": false,
-            "mapRoot": undefined
-        }),nodeResolve({
-            "browser": true
-        })]
-    });
-    await bundle.write({
-        "file": tFile,
-        "format": "iife",
-        "plugins": [terser.terser({
-            "format": {
-                "comments": false
-            }
-        })],
-        "sourcemap": false
-    });
-    console.log("created \"" + tFile + "\"");
+    let src_dir = path.join(frontendPath, "src");
+
+    let temp = fs.readdirSync(src_dir, { "withFileTypes": true });
+    for(let i = 0; i < temp.length; i++) {
+        if(temp[i].isFile()) {
+            let tFile = path.join(outpath, path.basename(temp[i].name, ".ts") + ".js");
+            let bundle = await rollup.rollup({
+                "input": path.join(src_dir, temp[i].name),
+                "plugins": [typescript({
+                    "tsconfig": path.join(frontendPath, "tsconfig.json"),
+                    "sourceMap": false,
+                    "mapRoot": undefined
+                })]
+            });
+            await bundle.write({
+                "file": tFile,
+                "format": "iife",
+                "plugins": [terser.terser({
+                    "format": {
+                        "comments": false
+                    }
+                })],
+                "sourcemap": false
+            });
+            console.log("created \"" + tFile + "\"");
+        }
+    }
 }
 
 async function processBackendJS(outpath) {
@@ -154,7 +138,7 @@ async function processBackendJS(outpath) {
 }
 
 try {
-    fs.rmdirSync(releasePath, { recursive: true });
+    fs.rmSync(releasePath, { recursive: true });
     console.log("deleted \"" + releasePath + "\"");
 
     fs.mkdirSync(releasePath, { recursive: true });

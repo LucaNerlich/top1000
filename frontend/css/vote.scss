@@ -27,10 +27,6 @@ html {
 @media screen and (min-width: 1600px) {
     html { font-size: 14px; }
 }
-//@media screen and (min-width: 1920px) {
-//    html { font-size: 15px; }
-//}
-
 
 .hidden {
     display: none !important;
@@ -54,20 +50,56 @@ h1 {
 .help {
     color: white;
     padding: 1rem;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
 }
 
-.info {
+.big {
+    font-size: 1.6rem;
+}
+
+.slide {
     color: white;
     padding: 1rem;
+    position: relative;
 }
 
-.form_buttons {
+.slide_buttons {
     padding-top: 1rem;
-    padding-left: 0.5rem;
+}
+
+.btn-vote {
+    background-color: rgb(246,34,123);
+    color: white;
+    font-weight: bold;
+
+    &:hover {
+        box-shadow: 1px 1px 1px 1px black;
+    }
+}
+
+.error {
+    color: red;
+    font-weight: bold;
 }
 
 .footer {
     height: 2rem;
+}
+
+.step {
+    position: absolute;
+    right: 0.5rem;
+    bottom: 0.5rem;
+    color: white;
+    font-size: 3rem;
+    user-select: none;
+    font-style: italic;
+}
+
+.select-highlight {
+    background-color: lightsalmon !important;
+    border-color: lightsalmon !important;
 }
 
 .select_item {
@@ -76,8 +108,8 @@ h1 {
     align-items: center;
     img {
         order: 1;
-        max-height: 3rem;
-        max-width: 6rem;
+        height: 3rem;
+        width: 3rem;
     }
     span {
         order: 2;

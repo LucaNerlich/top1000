@@ -5,20 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "nodemon",
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",            
-            "program": "-w debug/src ${workspaceFolder}/debug/src/index.js",
+            "internalConsoleOptions": "neverOpen",
+            "name": "nodemon",
+            "program": "${workspaceFolder}/debug/src/index.js",
             "request": "launch",
             "restart": true,
-            "runtimeExecutable": "npx",
-            "runtimeArgs": [
-                "nodemon"
-            ],
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node"
+            "type": "pwa-node",
+            "args": ["--watch", "${workspaceFolder}/debug/src"]
         },
         {
             "name": "debugscript",

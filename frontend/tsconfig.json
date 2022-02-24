@@ -9,7 +9,7 @@
         "strictNullChecks": true,
         "moduleResolution": "node",
         "sourceMap": true,
-        "mapRoot": "http://localhost:8000/javascript/",
+        "mapRoot": "http://localhost:8001/javascript/",
         "rootDir": "src",
         "baseUrl": "src",
     },

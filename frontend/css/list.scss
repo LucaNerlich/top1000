@@ -1,0 +1,259 @@
+html {
+    font-size: 10px;
+}
+
+#main {
+    max-width: 1140px !important;
+    background-color: rgb(0,42,65);
+    position: relative;
+}
+
+#background {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    z-index: -1;
+}
+
+@media screen and (min-width: 1023px) {
+    html { font-size: 11px; }
+}
+@media screen and (min-width: 1100px) {
+    html { font-size: 12px; }
+}
+@media screen and (min-width: 1300px) {
+    html { font-size: 13px; }
+}
+@media screen and (min-width: 1600px) {
+    html { font-size: 14px; }
+}
+
+#btnFilter {
+    right: 1rem;
+    top: 1rem;
+    width: 3rem;
+    height: 3rem;
+    border: 0;
+    
+    background-repeat: no-repeat;
+    background-position: 50%;
+    position: absolute;
+    background-color: transparent;
+}
+
+.icon-menu {
+    background-image: url(icons/menu.svg);
+}
+
+.icon-menu-open {
+    background-image: url(icons/menu_open.svg);
+}
+
+#filter {
+    color: white;
+    padding: 2rem;
+}
+
+#pages {
+    margin-top: 1rem;
+
+    button {
+        border: 0;
+        border-right: 1px solid rgb(0,42,65);
+        background-color: white;
+
+        &:hover {
+            background-color: rgb(246,34,123);
+        }
+    }
+}
+
+#mask {
+    cursor: wait;
+    opacity: 0;
+    width: 100%;
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    left: 0;
+}
+
+#nogames {
+    font-size: 1.5rem;
+    font-style: italic;
+    color: white;
+    text-align: center;
+}
+
+.page-current {
+    background-color: rgb(246,34,123) !important;
+    color: black;
+}
+
+.hidden {
+    display: none !important;
+}
+
+h1 {
+    text-align: center;
+    color: rgb(246,34,123);
+    font-weight: bold;
+    padding-top: 1rem;
+}
+
+.footer {
+    height: 2rem;
+}
+
+.btn_expand_more {
+    background-image:url(icons/expand_more-white.svg);
+}
+
+.btn_expand_less {
+    background-image:url(icons/expand_less-white.svg);
+}
+
+.game-selected {
+    span {
+        color: rgb(246,34,123) !important;
+    }
+    .btn_expand_more {
+        background-image:url(icons/expand_more-pink.svg) !important;
+    }    
+    .btn_expand_less {
+        background-image:url(icons/expand_less-pink.svg) !important;
+    }
+}
+
+.game {
+    color: white;
+    border-bottom: 1px solid white;
+}
+
+.game-head {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    height: 3rem;
+    user-select: none;
+    cursor: pointer;
+
+    &:hover {
+        color: rgb(246,34,123) !important;
+        .btn_expand_more {
+            background-image:url(icons/expand_more-pink.svg) !important;
+        }    
+        .btn_expand_less {
+            background-image:url(icons/expand_less-pink.svg) !important;
+        }
+    }
+
+    >div:first-of-type {
+        order: 1;
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 3rem;
+        display: table;
+
+        span {
+            font-size: 1.4rem;
+            font-weight: bolder;
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+    }
+
+    >div:nth-of-type(2) {
+        order: 2;
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 3rem;
+        padding: 2px;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    >div:nth-of-type(3) {
+        order: 3;
+        flex-grow: 5;
+        flex-shrink: 5;
+        overflow-x: hidden;
+
+        display: table;
+
+        span {
+            font-size: 1.1rem;
+            font-weight: bolder;
+            display: table-cell;
+            vertical-align: middle;
+            text-align: left;
+            padding-left: 1rem;
+        }
+    }
+
+    >div:last-of-type {
+        order: 4;
+        flex-grow: 0;
+        flex-shrink: 0;
+        width: 2.5rem;
+
+        span {
+            width: 100%;
+            height: 100%;
+            margin-left: 2px;
+            border: 0;
+            border-radius: 3px;
+            background-repeat: no-repeat;
+            background-position: 50%;
+            display: block;
+            background-color: transparent;
+        }
+    }
+}
+
+.game-body {
+    >div:first-of-type {
+        width: 100%;
+        display: flex;
+        flex-flow: row nowrap;
+        padding-top: 0.5rem;
+
+        >div:first-of-type {
+            order: 1;
+            flex-grow: 1;
+            flex-shrink: 1;
+            max-width: 50%;
+            text-align: center;
+
+            img {
+                width: 70%;
+                height: 90%;
+            }
+        }
+
+        >div:last-of-type {
+            order: 2;
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+    }
+
+    >div:last-of-type {
+        padding-left: 3rem;
+        padding-right: 2.5rem;
+        padding-bottom: 1rem;
+
+        p {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin: 0.3rem;
+        }
+    }
+}
